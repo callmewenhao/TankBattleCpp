@@ -7,42 +7,67 @@
 std::uniform_int_distribution<unsigned> randomDirection(0, 3);
 std::default_random_engine e;
 
-Enemy::Enemy(int x, int y, int d) : Tank(x, y, d) {}
+Enemy::Enemy(int x, int y, int d, std::vector<std::shared_ptr<Enemy>>& enemies) : Tank(x, y, d), enemyArr(enemies) {}
 
 void Enemy::run() {
-
+    bool crash = false;
     while(true) {
         shoot();
 
         switch (d) {
             case 0:
                 for (int i = 0; i < 30; ++i) {
-                    if(y > 0) {
-                        move();
+                    if(!enemyOverlaps()) {
+                        if(y > 0) {
+                            move();
+                        }
+                    } else {
+                        this->d = (int) randomDirection(e);
+                        crash = true;
+                        break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
                 break;
             case 1:
                 for (int i = 0; i < 30; ++i) {
-                    if(x + 40 < 1000) {
-                        move();
+                    if(!enemyOverlaps()) {
+                        if(x + 40 < 1000) {
+                            move();
+                        }
+                    } else {
+                        this->d = (int) randomDirection(e);
+                        crash = true;
+                        break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
                 break;
             case 2:
                 for (int i = 0; i < 30; ++i) {
-                    if(y + 40 < 700) {
-                        move();
+                    if(!enemyOverlaps()) {
+                        if(y + 40 < 700) {
+                            move();
+                        }
+                    } else {
+                        this->d = (int) randomDirection(e);
+                        crash = true;
+                        break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
                 break;
             case 3:
                 for (int i = 0; i < 30; ++i) {
-                    if(x > 0) {
-                        move();
+                    if(!enemyOverlaps()) {
+                        if(x > 0) {
+                            move();
+                        }
+                    }
+                    else {
+                        this->d = (int) randomDirection(e);
+                        crash = true;
+                        break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
@@ -50,12 +75,31 @@ void Enemy::run() {
             default:break;
         }
 
-        this->d = randomDirection(e);
+        // change the direction of enemy tank randomly if crashed!
+        if(crash) {
+            switch (d) {
+                case 0:
+                    move();
+                    break;
+                case 1:
+                    move();
+                    break;
+                case 2:
+                    move();
+                    break;
+                case 3:
+                    move();
+                    break;
+            }
+            crash = false;
+        } else {
+            this->d = (int) randomDirection(e);
+        }
 
+        // if enemy tank is dead, this thread is over!
         if(!isLive) {
             break;
         }
-
     }
 }
 
@@ -86,5 +130,14 @@ std::shared_ptr<Bullet> Enemy::shoot() {
     }
 
     return bullet;
+}
+
+bool Enemy::enemyOverlaps() {
+    for(auto enemy : enemyArr) {
+        if(this != enemy.get()) {
+            if(this->isOverlap(enemy)) return true;
+        }
+    }
+    return false;
 }
 
