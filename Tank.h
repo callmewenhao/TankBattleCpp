@@ -22,6 +22,7 @@ public:
     Tank(int x, int y, int d);
     void move();
     virtual std::shared_ptr<Bullet> shoot() = 0; // virtual func
+    bool isOverlap(std::shared_ptr<Tank> tank) const;
 
 };
 
