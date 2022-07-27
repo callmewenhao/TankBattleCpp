@@ -23,8 +23,19 @@ void Tank::move() {
     }
 }
 
+Tank::Tank(int x, int y, int d) : x(x), y(y), d(d) {}
 
-Tank::Tank(int x, int y, int d) : x(x), y(y), d(d){}
+bool Tank::isOverlap(std::shared_ptr<Tank> t) const {
+    if (t->x <= this->x && this->x <= t->x + 40) {
+        if (t->y <= this->y && this->y <= t->y + 40) return true; // left top point
+        if (t->y <= this->y + 40 && this->y + 40 <= t->y + 40) return true; // left bottom point
+    }
+    if (t->x <= this->x + 40 && this->x + 40 <= t->x + 40) {
+        if (t->y <= this->y && this->y <= t->y + 40) return true; // right top point
+        if (t->y <= this->y + 40 && this->y + 40 <= t->y + 40) return true; // right bottom point
+    }
+    return false;
+}
 
 
 
