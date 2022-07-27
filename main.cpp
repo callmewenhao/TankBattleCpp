@@ -5,14 +5,16 @@
 
 int main() {
 
-    initgraph(1000, 700);    // 创建绘图窗口，大小为 640x480 像素
+    initgraph(1000, 700);    // init the windows
 
     // our main thread
     Game game;
-    std::thread paintPanel(&Game::play, &game); // a ref or ptr for second para
-    paintPanel.join();
+    std::thread repaint(&Game::paint, &game); // a ref or ptr for second para
+    std::thread updateInfo(&Game::update, &game); // a ref or ptr for second para
+    repaint.join();
+    updateInfo.join();
 
-//    closegraph();            // 关闭绘图窗口
+    closegraph();            // 关闭绘图窗口
     return 0;
 
 }
